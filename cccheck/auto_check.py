@@ -9,6 +9,9 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 import time
 from cccheck.exceptions import CheckException, LoginException
 from requests.exceptions import HTTPError
+from chinese_calendar import is_holiday
+import datetime
+
 user_name = '18723228317'
 password = 'lwy19950906'
 url = '183.230.102.33:14003'
@@ -60,16 +63,19 @@ def check_in(uid, token):
 
 
 def daily_check():
-    time.sleep(random.randint(0, 840))
-    try:
-        uid, token = login()
-        check_in(uid, token)
-    except LoginException as e:
-        logging.exception(e)
-    except HTTPError as e:
-        logging.exception(e)
-    except CheckException as e:
-        logging.exception(e)
+    if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))):
+        pass
+    else:
+        time.sleep(random.randint(0, 840))
+        try:
+            uid, token = login()
+            check_in(uid, token)
+        except LoginException as e:
+            logging.exception(e)
+        except HTTPError as e:
+            logging.exception(e)
+        except CheckException as e:
+            logging.exception(e)
 
 
 if __name__ == '__main__':
