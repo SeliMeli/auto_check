@@ -9,8 +9,8 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 import time
 
 
-user_name = '15823315964'
-password = 'zhou6607'
+user_name = '18723228317'
+password = 'lwy19950906'
 url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
 check_in_uri = '/app/checkin/clock'
