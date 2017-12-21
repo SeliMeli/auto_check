@@ -188,3 +188,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.idea/auto_check.iml
+.idea/misc.xml
+.idea/modules.xml
+.vscode/settings.json

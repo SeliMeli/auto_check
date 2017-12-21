@@ -7,8 +7,8 @@ import requests
 import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 import time
-
-
+from cccheck.exceptions import CheckException, LoginException
+from requests.exceptions import HTTPError
 user_name = '18723228317'
 password = 'lwy19950906'
 url = '183.230.102.33:14003'
@@ -37,7 +37,7 @@ def login():
     json_result = r.json()
     returnCode = json_result.get('returnCode')
     if returnCode != 1:
-        logging.error('Log in failed')
+        raise LoginException(user=user_name, password=password, response=json_result)
     details = json_result.get('details')
     user = details.get('user')
     uid = user.get('id')
@@ -54,15 +54,23 @@ def check_in(uid, token):
     r.raise_for_status()
     r_json = r.json()
     return_code = r_json.get('returnCode')
-    if return_code != 200:
-        logging.error("check failed")
+    if return_code != 1:
+        raise CheckException(user=user_name, response=r_json)
     logging.info("check success")
 
 
 def daily_check():
     time.sleep(random.randint(0, 840))
-    uid, token = login()
-    check_in(uid, token)
+    try:
+        uid, token = login()
+        check_in(uid, token)
+    except LoginException as e:
+        logging.exception(e)
+    except HTTPError as e:
+        logging.exception(e)
+    except CheckException as e:
+        logging.exception(e)
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
