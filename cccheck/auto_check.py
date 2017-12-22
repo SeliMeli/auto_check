@@ -90,7 +90,10 @@ def daily_check():
     if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).date()):
         pass
     else:
-        time.sleep(random.randint(0, 840))
+        run_after = random.randint(0, 840)
+        logging.info('Auto Check in/out start in '+run_after+'secs')
+        time.sleep(run_after)
+
         try:
             uid, token = login()
             check_in(uid, token)
