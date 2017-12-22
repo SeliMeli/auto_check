@@ -81,7 +81,7 @@ def daily_check():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
     scheduler = BlockingScheduler()
-    scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-21 17:30:00 CST')
-    scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-22 08:15:00 CST')
+    scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-21 17:30:00')
+    scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-22 08:15:00')
     logging.info("mission started")
     scheduler.start()
