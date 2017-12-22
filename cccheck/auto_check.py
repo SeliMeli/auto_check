@@ -7,10 +7,13 @@ import requests
 import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 import time
+from cccheck.exceptions import CheckException, LoginException
+from requests.exceptions import HTTPError
+from chinese_calendar import is_holiday
+import datetime
 
-
-user_name = '15823315964'
-password = 'zhou6607'
+user_name = '18723228317'
+password = 'lwy19950906'
 url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
 check_in_uri = '/app/checkin/clock'
@@ -37,7 +40,7 @@ def login():
     json_result = r.json()
     returnCode = json_result.get('returnCode')
     if returnCode != 1:
-        logging.error('Log in failed')
+        raise LoginException(user=user_name, password=password, response=json_result)
     details = json_result.get('details')
     user = details.get('user')
     uid = user.get('id')
@@ -54,20 +57,31 @@ def check_in(uid, token):
     r.raise_for_status()
     r_json = r.json()
     return_code = r_json.get('returnCode')
-    if return_code != 200:
-        logging.error("check failed")
+    if return_code != 1:
+        raise CheckException(user=user_name, response=r_json)
     logging.info("check success")
 
 
 def daily_check():
-    time.sleep(random.randint(0, 840))
-    uid, token = login()
-    check_in(uid, token)
+    if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))):
+        pass
+    else:
+        time.sleep(random.randint(0, 840))
+        try:
+            uid, token = login()
+            check_in(uid, token)
+        except LoginException as e:
+            logging.exception(e)
+        except HTTPError as e:
+            logging.exception(e)
+        except CheckException as e:
+            logging.exception(e)
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
     scheduler = BlockingScheduler()
-    scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-21 18:08:00 CST')
+    scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-21 17:30:00 CST')
     scheduler.add_job(daily_check, 'interval', days=1, start_date='2017-12-22 08:15:00 CST')
     logging.info("mission started")
     scheduler.start()
