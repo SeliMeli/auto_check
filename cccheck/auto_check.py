@@ -19,7 +19,7 @@ login_uri = '/app/index/login'
 check_in_uri = '/app/checkin/clock'
 check_in_device = '2100060101'
 check_in_date = datetime.datetime.strptime('2017-12-21 08:15:00 +0800', '%Y-%m-%d %H:%M:%S %z')
-check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00 +0800', '%Y-%m-%d %H:%M:S %z')
+check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00 +0800', '%Y-%m-%d %H:%M:%S %z')
 
 
 def get_random_string():
@@ -80,13 +80,10 @@ def daily_check():
             logging.exception(e)
 
 
-def pri():
-    print('Hello')
-
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
     scheduler = BlockingScheduler()
-    scheduler.add_job(daily_check(), 'interval', days=1, start_date=check_in_date)
+    scheduler.add_job(daily_check, 'interval', days=1, start_date=check_in_date)
     scheduler.add_job(daily_check, 'interval', days=1, start_date=check_out_date)
     logging.info("mission started")
     scheduler.start()
