@@ -65,7 +65,7 @@ def check_in(uid, token):
 
 
 def daily_check():
-    if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))):
+    if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).date()):
         pass
     else:
         time.sleep(random.randint(0, 840))
@@ -78,6 +78,7 @@ def daily_check():
             logging.exception(e)
         except CheckException as e:
             logging.exception(e)
+
 
 
 if __name__ == '__main__':
