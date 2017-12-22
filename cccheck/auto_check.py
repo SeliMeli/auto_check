@@ -3,11 +3,13 @@
 import string
 import random
 import hashlib
+from functools import wraps
+
 import requests
 import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 import time
-from cccheck.exceptions import CheckException, LoginException
+from cccheck.exceptions import CheckException, LoginException, RetryException
 from requests.exceptions import HTTPError
 from chinese_calendar import is_holiday
 import datetime
@@ -22,6 +24,25 @@ check_in_date = datetime.datetime.strptime('2017-12-21 08:15:00 +0800', '%Y-%m-%
 check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00 +0800', '%Y-%m-%d %H:%M:%S %z')
 
 
+def login_cache(func):
+    uid_token = {'uid': 'default', 'token': 'default'}
+    refresh_times = 0
+
+    @wraps(func)
+    def _wrapper(*args):
+        if args:
+            if refresh_times > 2:
+                raise RetryException()
+            uid, token = func(args)
+            uid_token['uid'] = uid
+            uid_token['token'] = token
+            ++refresh_times
+            return uid, token
+        if uid_token.get('token') != 'default':
+            return uid_token['uid'], uid_token['token']
+    return _wrapper
+
+
 def get_random_string():
     return ''.join(random.choice(string.digits+string.ascii_lowercase) for _ in range(16))
 
@@ -33,7 +54,8 @@ def get_encoded_password():
     return hashlib.md5(pre_encoded.encode('utf-8')).hexdigest(), salt
 
 
-def login():
+@login_cache
+def login(force=False):
     encoded_password, salt = get_encoded_password()
     headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip,deflate', 'User-Agent': 'okhttp/3.3.0', 'Content-Type': 'application/json;charset=utf-8'}
     payload = {'cellphoneId': '351952086244222', 'cellphoneInfo': '7.0SM-G9350', 'location': '', 'loginWay': '3', 'versionNum': '2.1.1.0', 'latitude': '0', 'loginName': user_name, 'longitude': '0', 'password': encoded_password, 'salt': salt}
@@ -78,6 +100,8 @@ def daily_check():
             logging.exception(e)
         except CheckException as e:
             logging.exception(e)
+            login(True)
+
 
 
 
