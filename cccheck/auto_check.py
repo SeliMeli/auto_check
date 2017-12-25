@@ -15,7 +15,7 @@ from chinese_calendar import is_holiday
 import datetime
 
 user_name = '18723228317'
-password = 'lwy19950906'
+password = 'luo19950906'
 url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
 check_in_uri = '/app/checkin/clock'
@@ -88,7 +88,7 @@ def check_in(uid, token):
 
 def daily_check():
     if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).date()):
-        pass
+        logging.info('Today is holiday')
     else:
         run_after = random.randint(0, 840)
         logging.info('Auto Check in/out start in '+run_after+'secs')
