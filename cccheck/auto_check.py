@@ -98,7 +98,7 @@ def daily_check():
         logging.info('Today is holiday')
     else:
         run_after = random.randint(0, 840)
- #       logging.info('Auto Check in/out start in '+run_after+'secs')
+        logging.info('Auto Check in/out start in '+str(run_after)+'secs')
         time.sleep(run_after)
 
         try:
