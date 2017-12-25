@@ -7,7 +7,7 @@ from functools import wraps
 
 import requests
 import logging
-from apscheduler.schedulers.blocking import BlockingScheduler
+
 import time
 from cccheck.exceptions import CheckException, LoginException, RetryException
 from requests.exceptions import HTTPError
@@ -119,11 +119,3 @@ def check_in():
 
 def check_out():
     daily_check()
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
-    scheduler = BlockingScheduler(timezone='Asia/Shanghai')
-    scheduler.add_job(check_in, 'interval', days=1, start_date=check_in_date)
-    scheduler.add_job(check_out, 'interval', days=1, start_date=check_out_date)
-    scheduler.start()
