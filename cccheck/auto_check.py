@@ -16,6 +16,8 @@ import datetime
 
 user_name = '18723228317'
 password = 'luo19950906'
+cellphoneId = '351952086244222'
+cellphoneInfo = '7.0SM-G9350'
 url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
 check_in_uri = '/app/checkin/clock'
@@ -58,7 +60,7 @@ def get_encoded_password():
 def login(force=False):
     encoded_password, salt = get_encoded_password()
     headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip,deflate', 'User-Agent': 'okhttp/3.3.0', 'Content-Type': 'application/json;charset=utf-8'}
-    payload = {'cellphoneId': '351952086244222', 'cellphoneInfo': '7.0SM-G9350', 'location': '', 'loginWay': '3', 'versionNum': '2.1.1.0', 'latitude': '0', 'loginName': user_name, 'longitude': '0', 'password': encoded_password, 'salt': salt}
+    payload = {'cellphoneId': cellphoneId, 'cellphoneInfo': cellphoneInfo, 'location': '', 'loginWay': '3', 'versionNum': '2.1.1.0', 'latitude': '0', 'loginName': user_name, 'longitude': '0', 'password': encoded_password, 'salt': salt}
     r = requests.post('http://'+url+login_uri, json=payload, headers=headers)
     r.raise_for_status()
     json_result = r.json()
@@ -106,12 +108,17 @@ def daily_check():
             login(True)
 
 
+def check_in():
+    daily_check()
 
+
+def check_out():
+    daily_check()
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
     scheduler = BlockingScheduler()
-    scheduler.add_job(daily_check, 'interval', days=1, start_date=check_in_date)
-    scheduler.add_job(daily_check, 'interval', days=1, start_date=check_out_date)
+    scheduler.add_job(check_in, 'interval', days=1, start_date=check_in_date)
+    scheduler.add_job(check_out, 'interval', days=1, start_date=check_out_date)
     logging.info("mission started")
     scheduler.start()
