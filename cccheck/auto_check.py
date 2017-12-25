@@ -22,8 +22,8 @@ url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
 check_in_uri = '/app/checkin/clock'
 check_in_device = '2100060101'
-check_in_date = datetime.datetime.strptime('2017-12-21 08:15:00 +0800', '%Y-%m-%d %H:%M:%S %z')
-check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00 +0800', '%Y-%m-%d %H:%M:%S %z')
+check_in_date = datetime.datetime.strptime('2017-12-21 08:15:00', '%Y-%m-%d %H:%M:%S')
+check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00', '%Y-%m-%d %H:%M:%S')
 
 
 def login_cache(func):
@@ -42,6 +42,11 @@ def login_cache(func):
             return uid, token
         if uid_token.get('token') != 'default':
             return uid_token['uid'], uid_token['token']
+        else:
+            uid, token = func(args)
+            uid_token['uid'] = uid
+            uid_token['token'] = token
+            return uid, token
     return _wrapper
 
 
@@ -64,8 +69,8 @@ def login(force=False):
     r = requests.post('http://'+url+login_uri, json=payload, headers=headers)
     r.raise_for_status()
     json_result = r.json()
-    returnCode = json_result.get('returnCode')
-    if returnCode != 1:
+    return_code = json_result.get('returnCode')
+    if return_code != 1:
         raise LoginException(user=user_name, password=password, response=json_result)
     details = json_result.get('details')
     user = details.get('user')
@@ -115,10 +120,10 @@ def check_in():
 def check_out():
     daily_check()
 
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s'+': '+'%(levelname)s'+': '+'%(message)s')
-    scheduler = BlockingScheduler()
+    scheduler = BlockingScheduler(timezone='Asia/Shanghai')
     scheduler.add_job(check_in, 'interval', days=1, start_date=check_in_date)
     scheduler.add_job(check_out, 'interval', days=1, start_date=check_out_date)
-    logging.info("mission started")
     scheduler.start()
