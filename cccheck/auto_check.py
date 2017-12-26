@@ -80,7 +80,7 @@ def login(force=False):
     return uid, token
 
 
-def check_in(uid, token):
+def check(uid, token):
     headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip,deflate', 'User-Agent': 'okhttp/3.3.0',
                'Content-Type': 'application/json;charset=utf-8', 'Access-Token': token}
     payload = {'checkinDeviceSn': check_in_device, 'userId': uid}
@@ -103,7 +103,7 @@ def daily_check():
 
         try:
             uid, token = login()
-            check_in(uid, token)
+            check(uid, token)
         except LoginException as e:
             logging.exception(e)
         except HTTPError as e:
