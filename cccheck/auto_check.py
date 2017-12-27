@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import string
 import random
 import hashlib
@@ -28,17 +29,13 @@ check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00', '%Y-%m-%d %H:
 
 def login_cache(func):
     uid_token = {'uid': 'default', 'token': 'default'}
-    refresh_times = 0
 
     @wraps(func)
     def _wrapper(*args):
         if args:
-            if refresh_times > 2:
-                raise RetryException()
             uid, token = func(args)
             uid_token['uid'] = uid
             uid_token['token'] = token
-            ++refresh_times
             return uid, token
         if uid_token.get('token') != 'default':
             return uid_token['uid'], uid_token['token']
@@ -80,7 +77,7 @@ def login(force=False):
     return uid, token
 
 
-def check_in(uid, token):
+def check(uid, token):
     headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip,deflate', 'User-Agent': 'okhttp/3.3.0',
                'Content-Type': 'application/json;charset=utf-8', 'Access-Token': token}
     payload = {'checkinDeviceSn': check_in_device, 'userId': uid}
@@ -97,20 +94,35 @@ def daily_check():
     if is_holiday(datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).date()):
         logging.info('Today is holiday')
     else:
-        run_after = random.randint(0, 840)
-        logging.info('Auto Check in/out start in '+run_after+'secs')
+        run_after = random.randint(0, 540)
+        logging.info('Auto Check in/out start in '+str(run_after)+'secs')
         time.sleep(run_after)
 
         try:
             uid, token = login()
-            check_in(uid, token)
+            check(uid, token)
         except LoginException as e:
             logging.exception(e)
+            emergence_trigger()
         except HTTPError as e:
             logging.exception(e)
+            emergence_trigger()
         except CheckException as e:
             logging.exception(e)
-            login(True)
+            emergence_trigger()
+
+
+def emergence_trigger():
+    logging.warning("EMERGENCE TRIGGER ENGAGED, TRYING RE-LOGIN AND RE-CHECK")
+    logging.warning("EMERGENCE WILL RUN IN 60 SECS TO AVOID BOT DETECTION")
+    time.sleep(random.randint(60))
+    try:
+        uid, token = login(True)
+        check(uid, token)
+    except Exception as e:
+        logging.warning("EMERGENCE TRY FAILED!!")
+        logging.exception(e)
+    logging.warning("EMERGENCE LIFTED, RETURN NORMAL PROCESS")
 
 
 def check_in():
