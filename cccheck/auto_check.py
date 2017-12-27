@@ -109,17 +109,19 @@ def daily_check():
             logging.exception(e)
         except HTTPError as e:
             logging.exception(e)
-        except CheckException as e:
-            logging.exception(e)
+        except CheckException:
             emergence_trigger()
 
 
 def emergence_trigger():
+    logging.warning("EMERGENCE TRIGGER ENGAGED, TRYING RE-LOGIN AND RE-CHECK")
     try:
         uid, token = login(True)
         check(uid, token)
     except Exception as e:
+        logging.warning("EMERGENCE TRY FAILED!!")
         logging.info(e)
+    logging.warning("EMERGENCE LIFTED, RETURN NORMAL PROCESS")
 
 
 def check_in():
