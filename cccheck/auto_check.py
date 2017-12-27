@@ -15,9 +15,9 @@ from requests.exceptions import HTTPError
 from chinese_calendar import is_holiday
 import datetime
 
-user_name = '187****8317'
+user_name = '187*****317'
 password = '*********'
-cellphoneId = '3519*********22'
+cellphoneId = '35**********222'
 cellphoneInfo = '7.0SM-G9350'
 url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
@@ -114,15 +114,16 @@ def daily_check():
 
 def emergence_trigger():
     logging.warning("EMERGENCE TRIGGER ENGAGED, TRYING RE-LOGIN AND RE-CHECK")
-    logging.warning("EMERGENCE WILL RUN IN 60 SECS TO AVOID BOT DETECTION")
-    time.sleep(random.randint(60))
+    logging.warning("EMERGENCE WILL RUN IN 30 SECS TO AVOID BOT DETECTION")
+
+    time.sleep(random.randint(0, 30))
     try:
         uid, token = login(True)
         check(uid, token)
+        logging.warning("EMERGENCE LIFTED, RETURN NORMAL PROCESS")
     except Exception as e:
         logging.warning("EMERGENCE TRY FAILED!!")
         logging.exception(e)
-    logging.warning("EMERGENCE LIFTED, RETURN NORMAL PROCESS")
 
 
 def check_in():
