@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import string
 import random
 import hashlib
@@ -110,7 +111,15 @@ def daily_check():
             logging.exception(e)
         except CheckException as e:
             logging.exception(e)
-            login(True)
+            emergence_trigger()
+
+
+def emergence_trigger():
+    try:
+        uid, token = login(True)
+        check(uid, token)
+    except Exception as e:
+        logging.info(e)
 
 
 def check_in():
