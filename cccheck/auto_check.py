@@ -29,17 +29,13 @@ check_out_date = datetime.datetime.strptime('2017-12-21 17:30:00', '%Y-%m-%d %H:
 
 def login_cache(func):
     uid_token = {'uid': 'default', 'token': 'default'}
-    refresh_times = 0
 
     @wraps(func)
     def _wrapper(*args):
         if args:
-            if refresh_times > 2:
-                raise RetryException()
             uid, token = func(args)
             uid_token['uid'] = uid
             uid_token['token'] = token
-            ++refresh_times
             return uid, token
         if uid_token.get('token') != 'default':
             return uid_token['uid'], uid_token['token']
@@ -107,9 +103,12 @@ def daily_check():
             check(uid, token)
         except LoginException as e:
             logging.exception(e)
+            emergence_trigger()
         except HTTPError as e:
             logging.exception(e)
-        except CheckException:
+            emergence_trigger()
+        except CheckException as e:
+            logging.exception(e)
             emergence_trigger()
 
 
@@ -120,7 +119,7 @@ def emergence_trigger():
         check(uid, token)
     except Exception as e:
         logging.warning("EMERGENCE TRY FAILED!!")
-        logging.info(e)
+        logging.exception(e)
     logging.warning("EMERGENCE LIFTED, RETURN NORMAL PROCESS")
 
 
