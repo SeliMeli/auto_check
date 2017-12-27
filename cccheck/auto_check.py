@@ -15,9 +15,9 @@ from requests.exceptions import HTTPError
 from chinese_calendar import is_holiday
 import datetime
 
-user_name = '18723228317'
-password = 'luo19950906'
-cellphoneId = '351952086244222'
+user_name = '187****8317'
+password = '*********'
+cellphoneId = '3519*********22'
 cellphoneInfo = '7.0SM-G9350'
 url = '183.230.102.33:14003'
 login_uri = '/app/index/login'
