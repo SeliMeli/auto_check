@@ -114,6 +114,8 @@ def daily_check():
 
 def emergence_trigger():
     logging.warning("EMERGENCE TRIGGER ENGAGED, TRYING RE-LOGIN AND RE-CHECK")
+    logging.warning("EMERGENCE WILL RUN IN 60 SECS TO AVOID BOT DETECTION")
+    time.sleep(random.randint(60))
     try:
         uid, token = login(True)
         check(uid, token)
